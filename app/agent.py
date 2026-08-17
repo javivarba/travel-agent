@@ -207,6 +207,12 @@ def _llamar(
         "type": TOOL_BUSQUEDA,
         "name": "web_search",
         "max_uses": max_busquedas,
+        # Default de la API es ["code_execution_20260120"]: las búsquedas
+        # correrían dentro de code execution y los web_search_tool_result
+        # llegarían anidados, no en el primer nivel de response.content.
+        # extraer_urls_consultadas() los busca planos — con el default
+        # devolvería un set vacío y se descartaría el 100% de los ítems.
+        "allowed_callers": ["direct"],
     }
     if pais:
         tool_busqueda["user_location"] = {"type": "approximate", "country": pais}

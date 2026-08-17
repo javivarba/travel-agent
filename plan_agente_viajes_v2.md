@@ -342,6 +342,7 @@ tools = [
         "name": "web_search",
         "max_uses": 10,
         "user_location": {"type": "approximate", "country": pais_destino},
+        "allowed_callers": ["direct"],
     },
     {
         "name": "entregar_investigacion",
@@ -371,6 +372,7 @@ Puntos que no se pueden saltar:
 - **`cache_control` en el system.** El prompt + schema son largos y estáticos; vas a repetirlos decenas de veces afinando.
 - **`max_uses` y `max_tokens`.** Techo de costo por consulta.
 - **`model_json_schema()`**, nunca un dict escrito a mano.
+- **`allowed_callers: ["direct"]`.** El default de la API activa dynamic filtering vía code execution — ver 7.2 para por qué eso rompe el parser de URLs.
 
 ### 7.2 Verificación anti-alucinación
 
@@ -389,6 +391,8 @@ def urls_consultadas(response) -> set[str]:
 ```
 
 Política ante un ítem cuya `fuente_url` no aparece: **descartarlo**, y contarlo en una métrica `items_descartados_por_fuente`. Esa métrica es tu indicador de calidad del prompt: si sube al cambiar de versión, la versión es peor. No basada en opinión.
+
+Este parser asume que los bloques `web_search_tool_result` están planos en `response.content`. Esa estructura depende de `allowed_callers: ["direct"]` en la tool (7.1): con el default de la API, la búsqueda corre dentro de code execution y el bloque queda anidado dentro de un `code_execution_tool_result`, no en el primer nivel. Si algún día se habilita dynamic filtering, este parser tiene que recorrer también esa rama — o se rompe en silencio, devolviendo un set vacío y descartando todo.
 
 ### 7.3 Ruteo de modelos
 
