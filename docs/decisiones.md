@@ -90,3 +90,41 @@ generación para dos archivos cortos que además tienen audiencias distintas
 (uno lo consume una herramienta, el otro lo pega una persona). Decisión
 consciente — que quede registrada para que nadie lo "arregle" después
 metiendo esa indirección.
+
+---
+
+## 2026-08-17 — Fallback ante código de país no soportado por `user_location`
+
+**Qué:** en `_llamar()` (`app/agent.py`), si la llamada falla con
+`anthropic.BadRequestError` y el mensaje contiene "Country code ... is not
+supported", se reintenta la misma llamada sin `user_location` en la tool de
+búsqueda, en vez de fallar.
+
+**Por qué:** corriendo los casos dorados contra la API real, las 4 corridas
+con `pais="CR"` (Costa Rica) fallaron 100% de las veces con
+`Country code CR is not supported.`. La documentación de Anthropic confirma
+que `user_location.country` valida contra un conjunto de países soportados
+server-side, pero **no publica esa lista** — solo dice que la API rechaza
+códigos no soportados con un 400. No hay forma de saber de antemano qué
+países van a fallar sin probarlos contra la API real (confirmado: `ES`
+funciona en los 12 casos de Madrid, `CR` falla en las 12 de Costa Rica).
+
+Esto también explica un falso positivo que había en la corrida: el caso
+`05_lugar_inexistente` (que espera que la llamada falle, porque el destino
+no existe) pasaba 3/3 — pero por la razón equivocada. La API rechazaba la
+llamada por el país antes de que el modelo llegara a intentar buscar el
+lugar inventado, así que el test "pasaba" sin validar nunca lo que dice
+validar.
+
+**Qué se descartó:** mantener una allowlist propia de países soportados.
+No hay endpoint ni documentación pública contra la cual verificarla, así
+que sería una lista adivinada que se desactualiza en silencio. El fallback
+reactivo (probar, y si la API dice que no, reintentar sin localización) es
+correcto para cualquier país no soportado, no solo `CR`, y no depende de
+mantenimiento manual. El costo es perder precisión geográfica en la
+búsqueda para esos países — aceptable, porque `lugar` ya incluye el país
+en el texto del prompt.
+
+Verificado contra la API real: la llamada con `pais="CR"` dispara el 400,
+reintenta sin `user_location`, y completa la investigación (6 búsquedas
+reales) en el segundo intento.
