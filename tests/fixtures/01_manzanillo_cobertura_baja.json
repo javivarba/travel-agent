@@ -1,0 +1,56 @@
+{
+  "_nota": "FIXTURE SINTÉTICO de arranque, no proviene de una corrida real. Sirve para probar el runner en modo --fixtures antes de gastar API. Reemplazalo con `python -m evals.runner --casos 01_manzanillo_cobertura_baja --grabar`.",
+  "caso_id": "01_manzanillo_cobertura_baja",
+  "investigacion": {
+    "nota_temporada": "En el Caribe sur de Costa Rica, septiembre y octubre suelen ser los meses más secos y soleados del año, al contrario del Pacífico.",
+    "imprescindibles": [
+      {
+        "nombre": "Refugio Nacional de Vida Silvestre Gandoca-Manzanillo",
+        "categorias": ["naturaleza", "fotografia_paisajes"],
+        "descripcion": "Refugio mixto con senderos costeros y arrecife.",
+        "duracion_estimada": "3 horas",
+        "costo_aproximado": "gratis",
+        "moneda": "N/A",
+        "traslado": "a pie desde el centro de Manzanillo",
+        "maps_query": "Refugio Nacional Gandoca-Manzanillo, Limon",
+        "requiere_reserva": false,
+        "horario": "8:00-16:00",
+        "nivel_fisico": "medio",
+        "advertencias": ["Sendero resbaloso tras lluvia"],
+        "fuente_url": "https://ejemplo-sinac.cr/gandoca-manzanillo"
+      }
+    ],
+    "segun_intereses": [
+      {
+        "nombre": "Snorkel en el arrecife de Manzanillo",
+        "categorias": ["aventura_deportes", "playa_relax"],
+        "descripcion": "Salida guiada al arrecife frente al pueblo.",
+        "duracion_estimada": "2 horas",
+        "costo_aproximado": "45",
+        "moneda": "USD",
+        "traslado": "salida desde la playa principal",
+        "maps_query": "Playa Manzanillo, Limon",
+        "requiere_reserva": true,
+        "horario": null,
+        "nivel_fisico": "medio",
+        "advertencias": ["Corrientes fuertes fuera del arrecife"],
+        "fuente_url": "https://ejemplo-tours.cr/snorkel-manzanillo"
+      }
+    ],
+    "categorias_sin_resultados": [
+      {"categoria": "cultura_historia", "nota": "Sin museos ni sitios históricos formales en la zona."},
+      {"categoria": "gastronomia", "nota": "Oferta existente pero sin fuentes confiables con horarios vigentes."},
+      {"categoria": "vida_nocturna", "nota": "Sin locales con programación publicada."},
+      {"categoria": "compras_artesania", "nota": "Sin mercados de artesanía con presencia web verificable."},
+      {"categoria": "pesca", "nota": "Sin tours formales publicados; la pesca está regulada dentro del refugio."},
+      {"categoria": "naturaleza", "nota": "Cubierta en imprescindibles."},
+      {"categoria": "fotografia_paisajes", "nota": "Cubierta en imprescindibles."}
+    ]
+  },
+  "urls_investigacion": [
+    "ejemplo-sinac.cr/gandoca-manzanillo",
+    "ejemplo-tours.cr/snorkel-manzanillo"
+  ],
+  "eventos": {"eventos": [], "categorias_sin_resultados": [{"categoria": "eventos_deportivos_culturales", "nota": "Sin eventos programados publicados para esas fechas."}]},
+  "urls_eventos": []
+}
