@@ -140,8 +140,12 @@ def evaluar_investigacion(
     # --- Cobertura de categorías ------------------------------------------
     # Toda categoría pedida aparece con resultados o declarada sin ellos.
     # Sin esto el modelo puede ignorar una categoría en silencio.
+    # Mira ambas secciones: un ítem que califica para imprescindibles y
+    # segun_intereses va solo a imprescindibles (regla del prompt), así que
+    # limitarse a segun_intereses da falsos positivos en categorías cubiertas
+    # ahí.
     pedidas = {c for c in caso.intereses if c != Categoria.eventos_deportivos_culturales}
-    con_resultados = {c for a in r.segun_intereses for c in a.categorias}
+    con_resultados = {c for a in _actividades(r) for c in a.categorias}
     declaradas = {x.categoria for x in r.categorias_sin_resultados}
     huerfanas = pedidas - con_resultados - declaradas
     out.append(Resultado(
@@ -156,7 +160,12 @@ def evaluar_investigacion(
         detalle="" if not contradictorias else f"con resultados y declaradas vacías: {contradictorias}",
     ))
 
-    intrusas = con_resultados - set(caso.intereses)
+    # Alcance distinto a con_resultados a propósito: imprescindibles es
+    # independiente de los intereses declarados, así que puede traer
+    # cualquier categoría sin que sea una intrusión. Esta aserción es sobre
+    # segun_intereses específicamente: ahí sí toda categoría tiene que
+    # corresponder a un interés pedido.
+    intrusas = {c for a in r.segun_intereses for c in a.categorias} - set(caso.intereses)
     out.append(Resultado(
         "sin_categorias_no_pedidas", not intrusas,
         detalle="" if not intrusas else f"{sorted(c.value for c in intrusas)}",
