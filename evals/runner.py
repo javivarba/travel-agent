@@ -23,6 +23,7 @@ from datetime import date, datetime
 from pathlib import Path
 
 import anthropic
+from dotenv import load_dotenv
 
 from app import agent
 from app.models import RespuestaEventos, RespuestaInvestigacion
@@ -285,6 +286,8 @@ def comparar(v1: str, v2: str) -> None:
 # --------------------------------------------------------------------------
 
 def main() -> None:
+    load_dotenv()  # ANTHROPIC_API_KEY vive en .env; anthropic.Anthropic() solo lee el entorno del proceso.
+
     p = argparse.ArgumentParser(description="Harness de evals del agente de viajes")
     p.add_argument("--version", default="v1", help="versión de prompt a evaluar")
     p.add_argument("--n", type=int, default=3, help="corridas por caso (varianza)")
