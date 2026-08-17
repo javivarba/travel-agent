@@ -67,3 +67,26 @@ semánticamente contradictorio.
 marcarse como intrusión. Esa aserción se dejó con su alcance original,
 mirando solo `segun_intereses` — es la sección donde "categoría no pedida"
 tiene sentido como fallo.
+
+---
+
+## 2026-08-17 — No unificar `CLAUDE.md` e `instrucciones_proyecto_claude.md`
+
+**Qué:** los dos archivos siguen conviviendo con contenido parcialmente
+superpuesto (bio del autor, cómo prefiere que se le ayude). No se fusionan
+ni se hace que uno derive del otro.
+
+**Por qué:** son mecanismos distintos, no una duplicación accidental.
+`CLAUDE.md` lo lee Claude Code al trabajar en este repo. `docs/instrucciones_proyecto_claude.md`
+es texto para pegar a mano en el campo de instrucciones de un proyecto de
+claude.ai, donde se sube además `docs/plan_agente_viajes_v2.md` y `CLAUDE.md`
+como conocimiento — un espacio de trabajo sin acceso al repo, para diseño y
+prompts en vez de código.
+
+**Qué se descartó:** generar `instrucciones_proyecto_claude.md` a partir de
+`CLAUDE.md` (o viceversa) para eliminar la superposición. Son ~25 líneas;
+sincronizarlas a mano cuesta menos que la indirección de mantener un paso de
+generación para dos archivos cortos que además tienen audiencias distintas
+(uno lo consume una herramienta, el otro lo pega una persona). Decisión
+consciente — que quede registrada para que nadie lo "arregle" después
+metiendo esa indirección.
