@@ -117,6 +117,33 @@ def test_detecta_duplicado_entre_secciones():
     assert not por_nombre(res, "sin_duplicados_entre_secciones").paso
 
 
+def test_categoria_cubierta_solo_en_imprescindibles_pasa_cobertura():
+    """Un ítem que califica para las dos secciones va solo a imprescindibles
+    (regla del prompt). Eso no es ignorar la categoría: cobertura_de_categorias
+    tiene que mirar ambas secciones, no solo segun_intereses."""
+    c = caso(intereses=[C.naturaleza, C.playa_relax])
+    r = respuesta(
+        imprescindibles=[actividad("Refugio Gandoca", (C.naturaleza,))],
+        segun_intereses=[actividad("Playa Manzanillo", (C.playa_relax,))],
+    )
+    res = aserciones.evaluar_investigacion(c, r, URLS)
+    assert por_nombre(res, "cobertura_de_categorias").paso
+    assert aserciones.resumen(res)["paso"]
+
+
+def test_categoria_solo_en_imprescindibles_no_dispara_categoria_no_pedida():
+    """imprescindibles es independiente de los intereses declarados: puede
+    traer categorías fuera de lo pedido sin que sea una intrusión. Esa regla
+    aplica solo a segun_intereses."""
+    c = caso(intereses=[C.gastronomia])
+    r = respuesta(
+        imprescindibles=[actividad("Parque Central", (C.naturaleza,))],
+        segun_intereses=[actividad("Restaurante", (C.gastronomia,))],
+    )
+    res = aserciones.evaluar_investigacion(c, r, URLS)
+    assert por_nombre(res, "sin_categorias_no_pedidas").paso
+
+
 def test_detecta_categoria_ignorada_en_silencio():
     """El fallo más sutil: pedís pesca, el modelo no la menciona ni con
     resultados ni como vacía, y la respuesta se ve bien."""

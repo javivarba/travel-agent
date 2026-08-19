@@ -207,33 +207,58 @@ def _llamar(
         "type": TOOL_BUSQUEDA,
         "name": "web_search",
         "max_uses": max_busquedas,
+        # Default de la API es ["code_execution_20260120"]: las búsquedas
+        # correrían dentro de code execution y los web_search_tool_result
+        # llegarían anidados, no en el primer nivel de response.content.
+        # extraer_urls_consultadas() los busca planos — con el default
+        # devolvería un set vacío y se descartaría el 100% de los ítems.
+        "allowed_callers": ["direct"],
     }
     if pais:
         tool_busqueda["user_location"] = {"type": "approximate", "country": pais}
 
+    kwargs = dict(
+        model=MODELO_INVESTIGACION,
+        max_tokens=8000,
+        system=[{
+            "type": "text",
+            "text": system_prompt,
+            # El prompt + schema son largos y estáticos: se repiten en
+            # cada corrida de evals. Sin caché, se paga completo cada vez.
+            "cache_control": {"type": "ephemeral"},
+        }],
+        messages=[{"role": "user", "content": mensaje_usuario}],
+        tools=[
+            tool_busqueda,
+            {
+                "name": nombre_tool,
+                "description": descripcion_tool,
+                "input_schema": esquema_para_tool(modelo_respuesta),
+            },
+        ],
+        # tool_choice queda en automático a propósito: forzar la tool de
+        # entrega haría que el modelo entregue sin haber buscado.
+    )
+
     try:
-        response = cliente.messages.create(
-            model=MODELO_INVESTIGACION,
-            max_tokens=8000,
-            system=[{
-                "type": "text",
-                "text": system_prompt,
-                # El prompt + schema son largos y estáticos: se repiten en
-                # cada corrida de evals. Sin caché, se paga completo cada vez.
-                "cache_control": {"type": "ephemeral"},
-            }],
-            messages=[{"role": "user", "content": mensaje_usuario}],
-            tools=[
-                tool_busqueda,
-                {
-                    "name": nombre_tool,
-                    "description": descripcion_tool,
-                    "input_schema": esquema_para_tool(modelo_respuesta),
-                },
-            ],
-            # tool_choice queda en automático a propósito: forzar la tool de
-            # entrega haría que el modelo entregue sin haber buscado.
+        response = cliente.messages.create(**kwargs)
+    except anthropic.BadRequestError as e:
+        # No hay lista pública de países soportados por user_location — la
+        # API valida server-side y devuelve este 400 recién al llamar. Se
+        # reintenta sin localización en vez de mantener una allowlist que
+        # no podemos verificar contra la API real.
+        codigo_no_soportado = (
+            pais and "user_location" in tool_busqueda
+            and "Country code" in str(e) and "is not supported" in str(e)
         )
+        if not codigo_no_soportado:
+            return ResultadoAgente(ok=False, error=f"API: {e}")
+        log.warning("Código de país no soportado por user_location (%s); reintentando sin localización", pais)
+        tool_busqueda.pop("user_location")
+        try:
+            response = cliente.messages.create(**kwargs)
+        except anthropic.APIError as e2:
+            return ResultadoAgente(ok=False, error=f"API: {e2}")
     except anthropic.APIError as e:
         return ResultadoAgente(ok=False, error=f"API: {e}")
 

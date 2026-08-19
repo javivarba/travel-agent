@@ -42,9 +42,7 @@
       {"categoria": "gastronomia", "nota": "Oferta existente pero sin fuentes confiables con horarios vigentes."},
       {"categoria": "vida_nocturna", "nota": "Sin locales con programación publicada."},
       {"categoria": "compras_artesania", "nota": "Sin mercados de artesanía con presencia web verificable."},
-      {"categoria": "pesca", "nota": "Sin tours formales publicados; la pesca está regulada dentro del refugio."},
-      {"categoria": "naturaleza", "nota": "Cubierta en imprescindibles."},
-      {"categoria": "fotografia_paisajes", "nota": "Cubierta en imprescindibles."}
+      {"categoria": "pesca", "nota": "Sin tours formales publicados; la pesca está regulada dentro del refugio."}
     ]
   },
   "urls_investigacion": [

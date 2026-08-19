@@ -16,7 +16,7 @@ from dataclasses import dataclass
 import anthropic
 from pydantic import BaseModel, Field, ValidationError
 
-from app.models import RespuestaInvestigacion
+from app.models import RespuestaInvestigacion, esquema_para_tool
 from evals.casos import Caso
 
 MODELO_JUEZ = "claude-sonnet-5"
@@ -118,7 +118,7 @@ def juzgar(
             tools=[{
                 "name": "calificar",
                 "description": "Entrega la calificación según la rúbrica.",
-                "input_schema": Calificacion.model_json_schema(),
+                "input_schema": esquema_para_tool(Calificacion),
             }],
             tool_choice={"type": "tool", "name": "calificar"},
         )

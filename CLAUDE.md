@@ -63,6 +63,8 @@ tests/
 frontend/
 docs/
   plan_agente_viajes_v2.md
+  instrucciones_proyecto_claude.md
+  decisiones.md       # Registro de decisiones de diseño no obvias
 ```
 
 ## Comandos
